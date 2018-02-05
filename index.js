@@ -40,8 +40,9 @@ function Httpthingspeak(log, config) {
     this.manufacturer = config["manufacturer"] || "Sample Manufacturer";
     this.model = config["model"] || "Sample Model";
     this.serial = config["serial"] || "Sample Serial";
-        this.temperatureService;
-        this.humidityService;
+    this.temperatureService;
+    this.humidityService;
+    this.airQualityService;
 }
 
 Httpthingspeak.prototype = {
@@ -91,6 +92,25 @@ Httpthingspeak.prototype = {
                                callback(null, value);
                         }
                 }.bind(this));
+
+        
+        getSensorParticulateDensityValue: function (callback) {
+                this.debug && this.log('getSensorParticulateDensityValue');
+                this.httpRequest(this.url,this.http_method,function(error, response, body) {
+                        if (error) {
+                                this.log('HTTP get failed: %s', error.message);
+                                callback(error);
+                        } else {
+                                this.debug && this.log('HTTP success. Got result ['+body+'].');
+                                var value = parseFloat(JSON.parse(body).field1);
+                                this.airQualityService.setCharacteristic(
+                                        Characteristic.AirParticulateDensity,
+                                        value
+                                );
+                               callback(null, value);
+                        }
+                }.bind(this));
+
     },
 
     identify: function (callback) {
@@ -123,6 +143,13 @@ Httpthingspeak.prototype = {
                                     .getCharacteristic(Characteristic.CurrentRelativeHumidity)
                                     .on('get', this.getSensorHumidityValue.bind(this));
                                 services.push(this.temperatureService);
+                                break;
+                        case "AirParticulateDensity":
+                                this.airQualityService = new Service.AirQualitySensor(this.name);
+                                this.airQualityService
+                                    .getCharacteristic(Characteristic.AirParticulateDensity)
+                                    .on('get', this.getSensorParticulateDensityValue.bind(this));
+                                services.push(this.airQualityService);
                                 break;
                         default:
                                 this.log('Error: unknown type: '+this.type+'. skipping...');
