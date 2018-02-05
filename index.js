@@ -59,12 +59,12 @@ Httpthingspeak.prototype = {
 
     getSensorTemperatureValue: function (callback) {
                 this.debug && this.log('getSensorTemperatureValue');
-                this.httpRequest(this.url,this.http_method,function(error, response, body)$
+                this.httpRequest(this.url,this.http_method,function(error, response, body) {
                         if (error) {
                                 this.log('HTTP get failed: %s', error.message);
                                 callback(error);
                         } else {
-                                this.debug && this.log('HTTP success. Got result ['+body+'$
+                                this.debug && this.log('HTTP success. Got result ['+body+'].');
                                 var value = parseFloat(JSON.parse(body).field1);
                                 this.temperatureService.setCharacteristic(
                                         Characteristic.CurrentTemperature,
@@ -75,14 +75,14 @@ Httpthingspeak.prototype = {
                 }.bind(this));
     },
 
-        getSensorHumidityValue: function (callback) {
+    getSensorHumidityValue: function (callback) {
                 this.debug && this.log('getSensorHumidityValue');
-                this.httpRequest(this.url,this.http_method,function(error, response, body)$
+                this.httpRequest(this.url,this.http_method,function(error, response, body) {
                         if (error) {
                                 this.log('HTTP get failed: %s', error.message);
                                 callback(error);
                         } else {
-                                this.debug && this.log('HTTP success. Got result ['+body+'$
+                                this.debug && this.log('HTTP success. Got result ['+body+'].');
                                 var value = parseFloat(JSON.parse(body).field2);
                                 this.temperatureService.setCharacteristic(
                                         Characteristic.CurrentRelativeHumidity,
@@ -111,21 +111,21 @@ Httpthingspeak.prototype = {
                 
                 switch (this.type) {
                         case "CurrentTemperature":
-                                this.temperatureService = new Service.TemperatureSensor(th$
+                                this.temperatureService = new Service.TemperatureSensor(this.name);
                                 this.temperatureService
-                                        .getCharacteristic(Characteristic.CurrentTemperatu$
-                                        .on('get', this.getSensorTemperatureValue.bind(thi$
+                                    .getCharacteristic(Characteristic.CurrentTemperature)
+                                    .on('get', this.getSensorTemperatureValue.bind(this));
                                 services.push(this.temperatureService);
                                 break;
                         case "CurrentRelativeHumidity":
-                                this.temperatureService = new Service.HumiditySensor(this.$
+                                this.temperatureService = new Service.HumiditySensor(this.name);
                                 this.temperatureService
-                                        .getCharacteristic(Characteristic.CurrentRelativeH$
-                                        .on('get', this.getSensorHumidityValue.bind(this));
+                                    .getCharacteristic(Characteristic.CurrentRelativeHumidity)
+                                    .on('get', this.getSensorHumidityValue.bind(this));
                                 services.push(this.temperatureService);
                                 break;
                         default:
-                                this.log('Error: unknown type: '+this.type+'. skipping...'$
+                                this.log('Error: unknown type: '+this.type+'. skipping...');
                 }
                 return services;
     }
