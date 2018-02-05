@@ -93,8 +93,9 @@ Httpthingspeak.prototype = {
                         }
                 }.bind(this));
 
-        
-        getSensorParticulateDensityValue: function (callback) {
+    },
+    
+    getSensorParticulateDensityValue: function (callback) {
                 this.debug && this.log('getSensorParticulateDensityValue');
                 this.httpRequest(this.url,this.http_method,function(error, response, body) {
                         if (error) {
