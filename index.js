@@ -29,8 +29,8 @@ module.exports = function (homebridge) {
 
 function Httpthingspeak(log, config) {
     this.log = log;
-        this.debug = config["debug"] || false;
-        this.debug && this.log('Httpthingspeak: reading config');
+    this.debug = config["debug"] || false;
+    this.debug && this.log('Httpthingspeak: reading config');
 
     // url info
     this.url = config["url"];
@@ -105,7 +105,7 @@ Httpthingspeak.prototype = {
                                 this.debug && this.log('HTTP success. Got result ['+body+'].');
                                 var value = parseFloat(JSON.parse(body).field1);
                                 this.airQualityService.setCharacteristic(
-                                        Characteristic.AirParticulateDensity,
+                                        Characteristic.PM2_5Density,
                                         value
                                 );
                                callback(null, value);
@@ -120,7 +120,7 @@ Httpthingspeak.prototype = {
     },
 
     getServices: function () {
-                this.debug && this.log("getServiecs");
+                this.debug && this.log("getServices");
                 var services = [],
                 informationService = new Service.AccessoryInformation();
 
@@ -148,7 +148,7 @@ Httpthingspeak.prototype = {
                         case "AirParticulateDensity":
                                 this.airQualityService = new Service.AirQualitySensor(this.name);
                                 this.airQualityService
-                                    .getCharacteristic(Characteristic.AirParticulateDensity)
+                                    .getCharacteristic(Characteristic.PM2_5Density)
                                     .on('get', this.getSensorParticulateDensityValue.bind(this));
                                 services.push(this.airQualityService);
                                 break;
